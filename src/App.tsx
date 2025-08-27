@@ -9,14 +9,21 @@ import type { StockRecommendation } from './types/stock';
 function App() {
   const [recommendation, setRecommendation] = useState<StockRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadRecommendation = () => {
-    setLoading(true);
+  const loadRecommendation = (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
     // Simulate API delay
     setTimeout(() => {
       const newRecommendation = getFakeStockRecommendation();
       setRecommendation(newRecommendation);
       setLoading(false);
+      setRefreshing(false);
     }, 1000);
   };
 
@@ -41,7 +48,7 @@ function App() {
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-400 mb-4">Failed to load recommendation</p>
           <button
-            onClick={loadRecommendation}
+            onClick={() => loadRecommendation()}
             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
           >
             Try Again
@@ -70,45 +77,52 @@ function App() {
               <span>{recommendation.date}</span>
             </div>
             <button
-              onClick={loadRecommendation}
-              className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              onClick={() => loadRecommendation(true)}
+              disabled={refreshing}
+              className={`flex items-center gap-1 transition-all duration-200 ${refreshing
+                ? 'text-blue-600 dark:text-blue-400 cursor-not-allowed'
+                : 'hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>New Recommendation</span>
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>{refreshing ? 'Loading...' : 'New Recommendation'}</span>
             </button>
           </div>
         </div>
 
-        {/* Main Stock Card */}
-        <div className="mb-8">
-          <StockCard
-            stock={recommendation.stock}
-            totalScore={recommendation.totalScore}
-          />
-        </div>
-
-        {/* Reasoning Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="w-5 h-5 text-yellow-500" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Why This Stock?
-            </h3>
+        {/* Main Content with fade transition */}
+        <div className={`transition-opacity duration-500 ${refreshing ? 'opacity-50' : 'opacity-100'}`}>
+          {/* Main Stock Card */}
+          <div className="mb-8">
+            <StockCard
+              stock={recommendation.stock}
+              totalScore={recommendation.totalScore}
+            />
           </div>
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {recommendation.reasoning}
-          </p>
-        </div>
 
-        {/* Market Signals */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Market Signals ({recommendation.signals.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recommendation.signals.map((signal) => (
-              <SignalIndicator key={signal.id} signal={signal} />
-            ))}
+          {/* Reasoning Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Lightbulb className="w-5 h-5 text-yellow-500" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Why This Stock?
+              </h3>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              {recommendation.reasoning}
+            </p>
+          </div>
+
+          {/* Market Signals */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Market Signals ({recommendation.signals.length})
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recommendation.signals.map((signal) => (
+                <SignalIndicator key={signal.id} signal={signal} />
+              ))}
+            </div>
           </div>
         </div>
 
