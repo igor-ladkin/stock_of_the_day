@@ -4,7 +4,7 @@ import { StockCard } from './components/StockCard';
 import { SignalIndicator } from './components/SignalIndicator';
 import { ThemeToggle } from './components/ThemeToggle';
 import { getFakeStockRecommendation } from './services/fakeStockData';
-import { StockRecommendation } from './types/stock';
+import type { StockRecommendation } from './types/stock';
 
 function App() {
   const [recommendation, setRecommendation] = useState<StockRecommendation | null>(null);
