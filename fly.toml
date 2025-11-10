@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for stock-of-the-day on 2025-08-27T08:00:42Z
+# fly.toml app configuration file generated for stock-of-the-day-lease on 2025-11-10T16:33:58Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'stock-of-the-day'
+app = 'stock-of-the-day-lease'
 primary_region = 'cdg'
 
 [build]
